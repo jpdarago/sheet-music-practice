@@ -1,0 +1,12 @@
+#sheet {
+    background: #eed;
+    padding: 10px;
+    border: 10px solid #ddc;
+    display: inline;
+}
+
+#sheet-wrapper {
+    text-align: center;
+    width: 100%;
+}
+
