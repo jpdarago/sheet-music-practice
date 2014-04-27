@@ -11,7 +11,7 @@ SheetPractice.Note = (function(){
     };
 
     Note.prototype.duration = function(){
-        return this.ticks.toString();
+        return (16 / this.ticks).toString();
     };
 
     Note.prototype.setCurrent = function(){

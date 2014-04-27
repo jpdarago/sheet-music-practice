@@ -1,34 +1,38 @@
 /*global SheetPractice, _ */
-SheetPractice.RandomNote = (function(){
-    function randomElem(arr) {
-        return arr[_.random(0,arr.length-1)];
-    }
-
+SheetPractice.RandomDuration = function(){
     var durations = [1, 2, 4, 8, 16];
+    return durations[_.random(0,durations.length-1)];
+};
+
+SheetPractice.RandomNoteInScale = function(){
     var scale = ["c","d","e","f","g","a","b"];
+    return scale[_.random(0,scale.length-1)] + "/4";
+};
 
-    return function(){
-        var duration = randomElem(durations);
-        return new SheetPractice.Note({
-            note: randomElem(scale) + "/4",
-            ticks: durations[duration],
-        });
-    }; 
-}());
+SheetPractice.RandomNote = function(){
+    return new SheetPractice.Note({
+        note: SheetPractice.RandomNoteInScale(),
+        ticks: SheetPractice.RandomDuration(),
+    });
+};
 
-SheetPractice.BuildBarNotes = (function(){ 
-    function buildBar(){
-        var total = 0, res = [];
-        while(total < 16) {
-            var note = SheetPractice.RandomNote();
-            if(note.ticks <= 16-total){
-                res.push(note);
-                total += note.ticks;
+SheetPractice.BuildBarNotes = function(){ 
+    var total = 0, res = [];
+    while(total < 16) {
+        var noteDuration = SheetPractice.RandomDuration();
+        if(noteDuration <= 16-total){
+            var group = [], soFar = 0;
+
+            for(soFar = 0; soFar < 4; soFar += noteDuration){
+                group.push(new SheetPractice.Note({
+                    ticks: noteDuration,
+                    note: SheetPractice.RandomNoteInScale(),
+                }));
             }
+
+            res.push(group);
+            total += soFar;
         }
-
-        return res;
     }
-
-    return buildBar;
-}());
+    return res;
+};

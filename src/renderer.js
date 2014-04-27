@@ -49,28 +49,45 @@ SheetPractice.Renderer = (function(){
         }
 
         function barToVexflowBar(bar) {
+            return _.map(bar,function(group){
+                    return _.map(group,buildVexFlowNote);
+            });
+        }
+
+        function barToVexflowBeam(bar){
             var i, res = [];
             for(i = 0; i < bar.length; i++){
-                res.push(buildVexFlowNote(bar[i]));
+                var group = bar[i];
+                if(group.length > 1){
+                    res.push(new Vex.Flow.Beam(group));
+                }
             }
             return res;
+        }
+
+        function buildStave(next){
+            var pos = next();
+            var stave = new Vex.Flow.Stave(pos.x, pos.y, me.staveWidth);
+            if(pos.x === 0){
+                stave.addClef("treble").addTimeSignature("4/4");
+            }
+            return stave;
         }
 
         var ctx = freshCanvas(canvas);
         var next = stavePositionSequence(me.staveWidth, me.staveHeight);
         var i, j, staves = [], bars = song.getBars();
         for(i = 0; i < bars.length; i++){
-            var pos = next();
-            console.log(pos);
-            var stave = new Vex.Flow.Stave(pos.x, pos.y, me.staveWidth);
-            if(pos.x === 0){
-                stave.addClef("treble").addTimeSignature("4/4");
-            }
+            var stave = buildStave(next);
 
-            var barNotes = barToVexflowBar(song.getBar(i));
+            var barNotes = barToVexflowBar(bars[i]);
+            var beams = barToVexflowBeam(barNotes);
+
             stave.setContext(ctx).draw();
-
-            Vex.Flow.Formatter.FormatAndDraw(ctx, stave, barNotes);
+            Vex.Flow.Formatter.FormatAndDraw(ctx, stave, _.flatten(barNotes));
+            for(j = 0; j < beams.length; j++){
+                beams[j].setContext(ctx).draw();
+            }
         }
     };
 

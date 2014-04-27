@@ -5,10 +5,10 @@ SheetPractice.Ticker = (function(){
     }
 
     Ticker.prototype.tick = function(){
-        if(this.song.remainingNotesInBar() === 0){
+        this.song.advanceCurrentNote();
+        if(this.song.remainingNotesInBar() <= 1){
             this.song.addBar(SheetPractice.BuildBarNotes());
         }
-        this.song.advanceCurrentNote();
     };
 
     return Ticker;

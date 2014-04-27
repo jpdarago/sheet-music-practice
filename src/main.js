@@ -10,9 +10,17 @@ window.requestAnimFrame = (function(){
 }());
 
 (function(canvas){
-    var song = new SheetPractice.Song(SheetPractice.BuildBarNotes());
+    var song = new SheetPractice.Song([
+        SheetPractice.BuildBarNotes()
+    ]);
     var ticker = new SheetPractice.Ticker(song);
-    var renderer = new SheetPractice.Renderer();
+    var renderer = new SheetPractice.Renderer({
+        staveWidth: 270,
+        staveHeight: 100,
+        canvasWidth: 1100,
+        canvasHeight: 500,
+        stavesPerLine: 4,
+    });
 
     function clearCanvas() {
         var ctx = canvas.getContext("2d");

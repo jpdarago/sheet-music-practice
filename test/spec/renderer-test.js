@@ -2,20 +2,8 @@
 describe("RendererTest", function(){
     beforeEach(function(){
         this.addMatchers(imagediff.jasmine);
-        this.song1 = new SheetPractice.Song([
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-        ]);
 
-        this.song2 = new SheetPractice.Song([
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-        ]);
-        this.song2.addBar([
-            new SheetPractice.Note({ note: "c/4", ticks: 4, }),
-        ]);
-
+        this.song4 = 
         this.renderer = new SheetPractice.Renderer({
             staveWidth: 200,
             staveHeight: 100,
@@ -45,11 +33,31 @@ describe("RendererTest", function(){
         stave.addClef("treble").addTimeSignature("4/4");
 
         var notes = [
-        new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" })
-            .setKeyStyle(0,{ fillStyle: "red", }),
+            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" })
+                .setKeyStyle(0,{ fillStyle: "red", }),
         ];
 
         drawStave(ctx, stave, notes);
+        return imagediff.toImageData(canvas);
+    } 
+
+    function simpleBeamedCanvas(){
+        var canvas = imagediff.createCanvas();
+        var ctx = getContext(canvas, 500, 250);
+
+        var stave = new Vex.Flow.Stave(0,0,200);
+        stave.addClef("treble").addTimeSignature("4/4");
+
+        var notes = [
+            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "8" })
+                .setKeyStyle(0,{ fillStyle: "red", }),
+            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "8" })
+        ];
+
+        var beam = new Vex.Flow.Beam(notes);
+        drawStave(ctx, stave, notes);
+        beam.setContext(ctx).draw();
+
         return imagediff.toImageData(canvas);
     }
 
@@ -82,31 +90,42 @@ describe("RendererTest", function(){
         var canvas = imagediff.createCanvas();
         var ctx = getContext(canvas, 500, 250);
 
-        var stave1 = new Vex.Flow.Stave(0,0,200);
-        stave1.addClef("treble").addTimeSignature("4/4");
-        var stave2 = new Vex.Flow.Stave(0,100,200);
-        stave2.addClef("treble").addTimeSignature("4/4");
-
-        var notes1 = [
-            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" })
-                .setKeyStyle(0,{ fillStyle: "red", }),
-            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
-            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
-            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
+        var allStaves = [
+            new Vex.Flow.Stave(0,0,200).addClef("treble").addTimeSignature("4/4"),
+            new Vex.Flow.Stave(200,0,200),
+            new Vex.Flow.Stave(0,100,200).addClef("treble").addTimeSignature("4/4"),
         ];
 
-        var notes2 = [
-            new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" })
+        var allNotes = [
+            [
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" })
+                    .setKeyStyle(0,{ fillStyle: "red", }),
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "q" }),
+            ],
+            [
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "h" }),
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "h" }),
+            ],
+            [
+                new Vex.Flow.StaveNote({ keys: ["c/4"], duration: "w" }),
+            ],
         ];
 
-        drawStave(ctx, stave1, notes1);
-        drawStave(ctx, stave2, notes2);
+        var i;
+        for(i = 0; i < allNotes.length; i++){
+            drawStave(ctx, allStaves[i], allNotes[i]);
+        }
+
         return imagediff.toImageData(canvas);
     }
 
     it("can draw a note", function(){
         var gotCanvas = imagediff.createCanvas();
-        this.renderer.render(gotCanvas, this.song1); 
+        this.renderer.render(gotCanvas, new SheetPractice.Song([[
+            [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+        ]]));
         var got = imagediff.toImageData(gotCanvas);
  
         expect(got).toImageDiffEqual(simpleCanvas());
@@ -114,7 +133,18 @@ describe("RendererTest", function(){
 
     it("can draw two staves side by side", function(){
         var gotCanvas = imagediff.createCanvas();
-        this.renderer.render(gotCanvas, this.song2); 
+        this.renderer.render(gotCanvas, new SheetPractice.Song([
+            [
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+            ],
+            [
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4, }) ],
+            ]
+        ])); 
+
         var got = imagediff.toImageData(gotCanvas);
  
         expect(got).toImageDiffEqual(sideBySideCanvas());
@@ -124,15 +154,43 @@ describe("RendererTest", function(){
         var renderer = new SheetPractice.Renderer({
             staveWidth: 200,
             staveHeight: 100,
-            stavesPerLine: 1,
+            stavesPerLine: 2,
             canvasWidth: 500,
             canvasHeight: 250,
         });
 
         var gotCanvas = imagediff.createCanvas();
-        renderer.render(gotCanvas, this.song2); 
+        renderer.render(gotCanvas, new SheetPractice.Song([
+            [
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4 }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4 }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4 }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 4 }) ],
+            ],
+            [
+                [ new SheetPractice.Note({ note: "c/4", ticks: 8 }) ],
+                [ new SheetPractice.Note({ note: "c/4", ticks: 8 }) ],
+            ],
+            [
+                [ new SheetPractice.Note({ note: "c/4", ticks: 16 }) ],
+            ]
+        ]));
         var got = imagediff.toImageData(gotCanvas);
  
         expect(got).toImageDiffEqual(twoLineCanvas());
     });
+
+    it("can beam notes", function(){
+        var gotCanvas = imagediff.createCanvas();
+        this.renderer.render(gotCanvas, new SheetPractice.Song([[
+            [
+                new SheetPractice.Note({ note: "c/4", ticks: 2 }),
+                new SheetPractice.Note({ note: "c/4", ticks: 2 }),
+            ],
+        ]]));
+        var got = imagediff.toImageData(gotCanvas);
+ 
+        expect(got).toImageDiffEqual(simpleBeamedCanvas());
+    });
+
 });
