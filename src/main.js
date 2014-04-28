@@ -9,6 +9,14 @@ window.requestAnimFrame = (function(){
           };
 }());
 
+function waitedTimeout(time){
+    var def = new $.deferred();
+    setTimeout(function(){
+        def.resolve();
+    },time*1000);
+    return def;
+}
+
 (function(canvas){
     var song = new SheetPractice.Song([
         SheetPractice.BuildBarNotes()
@@ -22,16 +30,23 @@ window.requestAnimFrame = (function(){
         stavesPerLine: 4,
     });
 
+
     function clearCanvas() {
         var ctx = canvas.getContext("2d");
         ctx.clearRect(0,0,canvas.width,canvas.height);
     }
 
-    setInterval(function(){
-        ticker.tick();
-    }, 2000);
+    var tempo = 60, time = new Date(), note = song.getCurrentNote();
+    var player = new SheetPractice.Player(window.Synth, tempo);
 
     (function renderLoop(){
+        var newTime = new Date();
+        var passed = newTime - time;
+        if(passed >= note.getTimeMillis(tempo)){
+            time = newTime;
+            note = ticker.tick();
+            player.playNote(note);
+        }
         window.requestAnimFrame(renderLoop);
         clearCanvas();
         renderer.render(canvas, song);

@@ -1,5 +1,5 @@
 /*global window, describe, it, expect, SheetPractice, beforeEach, spyOn*/
-describe("Ticker Suite",function(){
+describe("Ticker",function(){
     beforeEach(function(){
         this.notes = [
             [ 
@@ -23,10 +23,11 @@ describe("Ticker Suite",function(){
 
     it("should be able to tick the notes", function(){
         var previous = this.song.getCurrentNote();
-        this.ticker.tick();
+        var res = this.ticker.tick();
 
         expect(this.song.getCurrentNote()).toEqual(this.notes[1][0]);
         expect(this.song.getCurrentNote().isCurrentNote()).toBe(true);
+        expect(res).toEqual(this.song.getCurrentNote());
     });
 
     it("should add a bar when we tick further away", function(){

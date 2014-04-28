@@ -66,9 +66,9 @@ describe("BuildBar Suite",function(){
     });
 
     it("should group notes", function(){
-        spyOn(SheetPractice, "RandomDuration").andCallFake(iterator([2,2,4,4,4]));
+        spyOn(SheetPractice, "RandomDuration").andCallFake(iterator([2,2,4,4,4,4]));
         spyOn(SheetPractice, "RandomNoteInScale").andCallFake(iterator([
-            "c/4", "d/4", "d/4", "d/4", "d/4",
+            "c/4", "d/4", "d/4", "d/4", "d/4","d/4",
         ]));
         var barNotes = SheetPractice.BuildBarNotes();
 

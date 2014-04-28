@@ -9,6 +9,7 @@ SheetPractice.Ticker = (function(){
         if(this.song.remainingNotesInBar() <= 1){
             this.song.addBar(SheetPractice.BuildBarNotes());
         }
+        return this.song.getCurrentNote();
     };
 
     return Ticker;
