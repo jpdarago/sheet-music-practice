@@ -74,5 +74,9 @@ SheetPractice.Song = (function(){
         this.flipMark(previous, this.getCurrentNote());
     };
 
+    Song.prototype.getNotesInCurrentBar = function(){
+        return this.bars[this.currentBar];
+    };
+
     return Song;
 }());

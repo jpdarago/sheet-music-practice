@@ -1,6 +1,6 @@
 /*global spyOn, jasmine, describe, it, expect, beforeEach, Vex, imagediff, SheetPractice, _*/
 describe("Player", function(){
-    it("can play notes",function(){
+    it("can schedule notes",function(){
         var fakeSynth = jasmine.createSpyObj("fakeSynth",["createInstrument"]);
         var fakePiano = jasmine.createSpyObj("fakePiano",[ "play" ]);
 
